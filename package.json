@@ -1,0 +1,28 @@
+{
+  "name": "vscode-snippet-gen",
+  "displayName": "Snippet Generator",
+  "description": "Generate and manage reusable code snippets in VS Code.",
+  "version": "0.1.0",
+  "publisher": "your-username",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "snippet-gen.generateSnippet",
+        "title": "Generate Code Snippet"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "echo 'No build steps required'",
+    "test": "node ./test/extension.test.js"
+  },
+  "devDependencies": {}
+}
