@@ -17,6 +17,10 @@
       {
         "command": "snippet-gen.generateSnippet",
         "title": "Generate Code Snippet"
+      },
+      {
+        "command": "snippet-gen.importSnippet",
+        "title": "Import External Snippets"
       }
     ]
   },

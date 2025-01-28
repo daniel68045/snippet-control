@@ -58,16 +58,17 @@ function generateSnippet() {
     });
 }
 
-function saveSnippet(snippet) {
+function saveSnippet(snippet, languageId = null) {
   const editor = vscode.window.activeTextEditor;
-  if (!editor) {
-    vscode.window.showErrorMessage("No active editor found.");
-    return;
+
+  if (!languageId) {
+    if (!editor) {
+      vscode.window.showErrorMessage("No active editor found.");
+      return;
+    }
+    languageId = editor.document.languageId;
   }
 
-  const languageId = editor.document.languageId;
-
-  // Global snippet file location
   const globalSnippetsDir = path.join(
     process.env.HOME || process.env.USERPROFILE,
     "Library/Application Support/Code/User/snippets"
@@ -94,10 +95,10 @@ function saveSnippet(snippet) {
     `Snippet saved globally to ${snippetFile}`
   );
 
-  saveSnippetToMarkdown(snippet, editor);
+  saveSnippetToMarkdown(snippet, languageId);
 }
 
-function saveSnippetToMarkdown(snippet, editor) {
+function saveSnippetToMarkdown(snippet, languageId) {
   const workspaceFolders = vscode.workspace.workspaceFolders;
 
   if (!workspaceFolders) {
@@ -110,7 +111,9 @@ function saveSnippetToMarkdown(snippet, editor) {
   const workspacePath = workspaceFolders[0].uri.fsPath;
   const markdownFilePath = path.join(workspacePath, "SavedSnippets.md");
 
-  const snippetEntry = `### ${snippet.prefix}\n- **Description**: ${snippet.description}\n- **Language**: ${editor.document.languageId}\n\n`;
+  const snippetEntry = `### ${snippet.prefix}\n- **Description**: ${
+    snippet.description || "No description"
+  }\n- **Language**: ${languageId}\n\n`;
 
   fs.appendFileSync(markdownFilePath, snippetEntry);
 
@@ -119,7 +122,74 @@ function saveSnippetToMarkdown(snippet, editor) {
   );
 }
 
+function importSnippet() {
+  vscode.window
+    .showOpenDialog({
+      canSelectMany: false,
+      openLabel: "Select Snippet JSON File",
+      filters: { JSON: ["json"] },
+    })
+    .then((fileUri) => {
+      if (!fileUri || fileUri.length === 0) {
+        vscode.window.showWarningMessage("No file selected.");
+        return;
+      }
+
+      const filePath = fileUri[0].fsPath;
+
+      let importedSnippets;
+      try {
+        const fileContent = fs.readFileSync(filePath, "utf8");
+        importedSnippets = JSON.parse(fileContent);
+      } catch (error) {
+        vscode.window.showErrorMessage(
+          "Failed to read or parse the snippet file."
+        );
+        return;
+      }
+
+      vscode.window
+        .showInputBox({
+          prompt:
+            "Enter the language for these snippets (e.g., javascript, python)",
+          placeHolder: "e.g., javascript",
+          value: "javascript",
+        })
+        .then((languageId) => {
+          if (!languageId) {
+            vscode.window.showErrorMessage(
+              "Language is required for importing snippets."
+            );
+            return;
+          }
+
+          const isSingleSnippet =
+            importedSnippets.prefix &&
+            importedSnippets.body &&
+            importedSnippets.description;
+
+          let snippetsToProcess = {};
+          if (isSingleSnippet) {
+            snippetsToProcess["importedSnippet"] = importedSnippets;
+          } else {
+            snippetsToProcess = importedSnippets;
+          }
+
+          for (const [name, snippet] of Object.entries(snippetsToProcess)) {
+            saveSnippet(snippet, languageId);
+          }
+
+          vscode.window.showInformationMessage(
+            `Imported ${
+              Object.keys(snippetsToProcess).length
+            } snippet(s) successfully for ${languageId}!`
+          );
+        });
+    });
+}
+
 module.exports = {
   saveSnippet,
   generateSnippet,
+  importSnippet,
 };
