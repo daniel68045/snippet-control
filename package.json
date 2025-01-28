@@ -3,7 +3,7 @@
   "displayName": "Snippet Generator",
   "description": "Generate and manage reusable code snippets in VS Code.",
   "version": "0.1.0",
-  "publisher": "your-username",
+  "publisher": "daniel68045",
   "engines": {
     "vscode": "^1.75.0"
   },

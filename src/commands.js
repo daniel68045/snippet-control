@@ -2,11 +2,9 @@ const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
 
-/**
- * Generate a snippet from selected text.
- * @returns {void}
- */
 function generateSnippet() {
+  console.log("generateSnippet command called");
+
   const editor = vscode.window.activeTextEditor;
 
   if (!editor) {
@@ -23,53 +21,105 @@ function generateSnippet() {
     return;
   }
 
-  // Create a snippet object
-  const snippet = {
-    prefix: "exampleSnippet", // User-defined prefix
-    body: selectedText.split("\n"), // Convert to an array of lines
-    description: "Generated snippet from selected text",
-  };
+  vscode.window
+    .showInputBox({
+      prompt: "Enter a name for your snippet (prefix)",
+      placeHolder: "e.g., mySnippetName",
+      value: "exampleSnippet",
+    })
+    .then((snippetName) => {
+      if (!snippetName) {
+        vscode.window.showErrorMessage("Snippet name is required!");
+        return;
+      }
 
-  // Save the snippet to a JSON file
-  saveSnippet(snippet);
-  vscode.window.showInformationMessage("Snippet generated and saved!");
+      vscode.window
+        .showInputBox({
+          prompt: "Enter a description for your snippet",
+          placeHolder: "e.g., A reusable fetch function snippet",
+          value: "Generated snippet from selected text",
+        })
+        .then((snippetDescription) => {
+          if (!snippetDescription) {
+            vscode.window.showErrorMessage("Snippet description is required!");
+            return;
+          }
+
+          const snippet = {
+            prefix: snippetName,
+            body: selectedText.split("\n"),
+            description: snippetDescription,
+          };
+
+          console.log("Snippet to save:", JSON.stringify(snippet, null, 2));
+
+          saveSnippet(snippet);
+        });
+    });
 }
 
-/**
- * Save the snippet to a JSON file in the snippets folder.
- * @param {Object} snippet The snippet object to save.
- */
 function saveSnippet(snippet) {
-  const snippetsDir = path.join(__dirname, "../snippets");
-  const filePath = path.join(snippetsDir, "example.json");
-
-  // Ensure the snippets directory exists
-  if (!fs.existsSync(snippetsDir)) {
-    fs.mkdirSync(snippetsDir);
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    vscode.window.showErrorMessage("No active editor found.");
+    return;
   }
 
-  let existingSnippets = {};
+  const languageId = editor.document.languageId;
 
-  // Read and parse existing snippets safely
-  if (fs.existsSync(filePath)) {
-    try {
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      existingSnippets = fileContent ? JSON.parse(fileContent) : {};
-    } catch (error) {
-      vscode.window.showErrorMessage(
-        "Failed to parse snippets file. Resetting to a new file."
-      );
-      existingSnippets = {};
-    }
+  // Global snippet file location
+  const globalSnippetsDir = path.join(
+    process.env.HOME || process.env.USERPROFILE,
+    "Library/Application Support/Code/User/snippets"
+  );
+  const snippetFile = path.join(globalSnippetsDir, `${languageId}.json`);
+
+  if (!fs.existsSync(globalSnippetsDir)) {
+    fs.mkdirSync(globalSnippetsDir, { recursive: true });
   }
 
-  // Add the new snippet
+  const existingSnippets = fs.existsSync(snippetFile)
+    ? JSON.parse(fs.readFileSync(snippetFile, "utf8"))
+    : {};
+
   existingSnippets[snippet.prefix] = snippet;
 
-  // Write updated snippets back to the file
-  fs.writeFileSync(filePath, JSON.stringify(existingSnippets, null, 2), "utf8");
+  fs.writeFileSync(
+    snippetFile,
+    JSON.stringify(existingSnippets, null, 2),
+    "utf8"
+  );
+
+  vscode.window.showInformationMessage(
+    `Snippet saved globally to ${snippetFile}`
+  );
+
+  saveSnippetToMarkdown(snippet, editor);
+}
+
+function saveSnippetToMarkdown(snippet, editor) {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+
+  if (!workspaceFolders) {
+    vscode.window.showWarningMessage(
+      "No active workspace found. Snippet names cannot be saved to the project folder."
+    );
+    return;
+  }
+
+  const workspacePath = workspaceFolders[0].uri.fsPath;
+  const markdownFilePath = path.join(workspacePath, "SavedSnippets.md");
+
+  const snippetEntry = `### ${snippet.prefix}\n- **Description**: ${snippet.description}\n- **Language**: ${editor.document.languageId}\n\n`;
+
+  fs.appendFileSync(markdownFilePath, snippetEntry);
+
+  vscode.window.showInformationMessage(
+    `Snippet "${snippet.prefix}" added to ${markdownFilePath}`
+  );
 }
 
 module.exports = {
+  saveSnippet,
   generateSnippet,
 };
