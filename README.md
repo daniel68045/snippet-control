@@ -1,4 +1,4 @@
-## Snippet Control
+## [Snippet Control](https://marketplace.visualstudio.com/items?itemName=DanielPupke.vscode-snippet-gen)
 
 A VS Code (version 1.75.0 or higher) extension to generate, delete, import and export code snippets
 
