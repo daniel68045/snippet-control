@@ -1,0 +1,15 @@
+node_modules/
+.vscode-test/
+.vscodeignore
+.vscode/
+package-lock.json
+.git/
+.gitignore
+*.vsix
+*.log
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+README.md
+CHANGELOG.md
+
