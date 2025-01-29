@@ -188,8 +188,83 @@ function importSnippet() {
     });
 }
 
+function deleteSnippet() {
+  const globalSnippetsDir = path.join(
+    process.env.HOME || process.env.USERPROFILE,
+    "Library/Application Support/Code/User/snippets"
+  );
+
+  fs.readdir(globalSnippetsDir, (err, files) => {
+    if (err || files.length === 0) {
+      vscode.window.showErrorMessage("No snippets found.");
+      return;
+    }
+
+    vscode.window
+      .showQuickPick(files, {
+        placeHolder: "Select a snippet file to delete from",
+      })
+      .then((selectedFile) => {
+        if (!selectedFile) return;
+
+        const snippetFilePath = path.join(globalSnippetsDir, selectedFile);
+        const snippetData = JSON.parse(
+          fs.readFileSync(snippetFilePath, "utf8")
+        );
+
+        const snippetNames = Object.keys(snippetData);
+
+        vscode.window
+          .showQuickPick(snippetNames, {
+            placeHolder: "Select a snippet to delete",
+          })
+          .then((selectedSnippet) => {
+            if (!selectedSnippet) return;
+
+            delete snippetData[selectedSnippet];
+
+            fs.writeFileSync(
+              snippetFilePath,
+              JSON.stringify(snippetData, null, 2),
+              "utf8"
+            );
+
+            vscode.window.showInformationMessage(
+              `Snippet "${selectedSnippet}" deleted.`
+            );
+
+            removeSnippetFromMarkdown(selectedSnippet);
+          });
+      });
+  });
+}
+function removeSnippetFromMarkdown(snippetName) {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders) return;
+
+  const workspacePath = workspaceFolders[0].uri.fsPath;
+  const markdownFilePath = path.join(workspacePath, "SavedSnippets.md");
+
+  if (!fs.existsSync(markdownFilePath)) return;
+
+  let markdownContent = fs.readFileSync(markdownFilePath, "utf8");
+
+  const snippetRegex = new RegExp(
+    `### ${snippetName}\\n- \\*\\*Description\\*\\*:.*?\\n- \\*\\*Language\\*\\*:.*?\\n\\n`,
+    "g"
+  );
+  markdownContent = markdownContent.replace(snippetRegex, "");
+
+  fs.writeFileSync(markdownFilePath, markdownContent, "utf8");
+
+  vscode.window.showInformationMessage(
+    `Snippet "${snippetName}" removed from SavedSnippets.md.`
+  );
+}
+
 module.exports = {
   saveSnippet,
   generateSnippet,
   importSnippet,
+  deleteSnippet,
 };

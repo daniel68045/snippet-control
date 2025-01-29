@@ -21,6 +21,10 @@
       {
         "command": "snippet-gen.importSnippet",
         "title": "Import External Snippets"
+      },
+      {
+        "command": "snippet-gen.deleteSnippet",
+        "title": "Delete Snippet"
       }
     ]
   },

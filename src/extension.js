@@ -1,6 +1,7 @@
 const vscode = require("vscode");
 const { generateSnippet } = require("./commands");
 const { importSnippet } = require("./commands");
+const { deleteSnippet } = require("./commands");
 
 function activate(context) {
   const generateSnippetCommand = vscode.commands.registerCommand(
@@ -16,6 +17,13 @@ function activate(context) {
   );
 
   context.subscriptions.push(importSnippetCommand);
+
+  const deleteSnippetCommand = vscode.commands.registerCommand(
+    "snippet-gen.deleteSnippet",
+    deleteSnippet
+  );
+
+  context.subscriptions.push(deleteSnippetCommand);
 }
 
 function deactivate() {}
