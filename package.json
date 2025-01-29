@@ -8,7 +8,7 @@
     "vscode": "^1.75.0"
   },
   "categories": [
-    "Programming Languages"
+    "Extension Packs"
   ],
   "activationEvents": [],
   "main": "./src/extension.js",
@@ -19,12 +19,16 @@
         "title": "Generate Code Snippet"
       },
       {
+        "command": "snippet-gen.deleteSnippet",
+        "title": "Delete Snippet"
+      },
+      {
         "command": "snippet-gen.importSnippet",
         "title": "Import External Snippets"
       },
       {
-        "command": "snippet-gen.deleteSnippet",
-        "title": "Delete Snippet"
+        "command": "snippet-gen.exportSnippet",
+        "title": "Export Internal Snippets"
       }
     ]
   },

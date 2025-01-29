@@ -2,6 +2,7 @@ const vscode = require("vscode");
 const { generateSnippet } = require("./commands");
 const { importSnippet } = require("./commands");
 const { deleteSnippet } = require("./commands");
+const { exportSnippet } = require("./commands");
 
 function activate(context) {
   const generateSnippetCommand = vscode.commands.registerCommand(
@@ -24,6 +25,11 @@ function activate(context) {
   );
 
   context.subscriptions.push(deleteSnippetCommand);
+
+  context.subscriptions.push = vscode.commands.registerCommand(
+    "snippet-gen.exportSnippet",
+    exportSnippet
+  );
 }
 
 function deactivate() {}
