@@ -10,7 +10,7 @@
   "categories": [
     "Snippets"
   ],
-  "icon": "icon.svg",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/daniel68045/snippet-ctrl"
