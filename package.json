@@ -2,7 +2,7 @@
   "name": "vscode-snippet-gen",
   "displayName": "Snippet Control",
   "description": "Generate and manage reusable code snippets in Visual Studio Code.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "DanielPupke",
   "engines": {
     "vscode": "^1.75.0"
@@ -10,7 +10,7 @@
   "categories": [
     "Snippets"
   ],
-  "icon": "icon.png",
+  "icon": "icon.svg",
   "repository": {
     "type": "git",
     "url": "https://github.com/daniel68045/snippet-ctrl"
