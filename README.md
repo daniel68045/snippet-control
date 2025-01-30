@@ -8,7 +8,7 @@ Generate
 
 1. Highlight the code you want to save as a snippet
 
-2. Open the Command Palette (`Cmd + Shift + P` `Ctrl + Shift + P`)
+2. Open the Command Palette (`Cmd + Shift + P` / `Ctrl + Shift + P`)
 
 3. Select `Generate Code Snippet`
 
