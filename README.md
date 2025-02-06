@@ -46,30 +46,6 @@ Delete
 
 4. Select the specific snippet to remove
 
-## Example Workflow
-
-1. **Generate a Snippet**:
-
-- Highlight a commonly used function
-
-- Run `Generate Code Snippet`
-
-- Provide a name and description
-
-2. **Import External Snippets**:
-
-- Upload a JSON file with snippets from another project
-
-- Use `Import External Snippets` to add them to your global collection/md file
-
-3. **Export Snippets**:
-
-- Run `Export Snippets` to save your current snippets in your md file locally
-
-4. **Delete Unused Snippets**:
-
-- Use `Delete Snippet` to remove snippets you no longer need
-
 ## Feedback
 
 - Found a bug? [Submit an issue](https://github.com/daniel68045/snippet-ctrl/issues)
